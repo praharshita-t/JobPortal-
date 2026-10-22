@@ -61,6 +61,12 @@ class StudentProfile(Base):
 
     # Experience & Certifications
     experience = Column(JSON, default=list, nullable=False)
+    certifications = Column(JSON, default=list, nullable=False)
+
+    # Resume Tracking & Intelligence Metadata
+    resume_filename = Column(String(255), nullable=True)
+    resume_uploaded_at = Column(DateTime, nullable=True)
+    resume_extraction_metadata = Column(JSON, default=dict, nullable=False)
 
     # Career Preferences
     preferred_roles = Column(JSON, default=list, nullable=False)

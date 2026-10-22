@@ -17,6 +17,7 @@ import {
   Mail,
   AlertCircle
 } from 'lucide-react';
+import ResumeUploadSection from './ResumeUploadSection';
 
 const COMMON_SKILLS = [
   "Python", "JavaScript", "TypeScript", "C++", "Java", "Go", "SQL",
@@ -241,6 +242,29 @@ export default function StudentOnboardingModal({
           {/* STEP 1: Personal Info */}
           {currentStep === 1 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
+              {/* Resume Intelligence Extraction Dropzone & Review */}
+              <ResumeUploadSection
+                currentProfile={formData}
+                onApplyExtraction={(updatedProfile) => {
+                  setFormData(prev => ({
+                    ...prev,
+                    full_name: updatedProfile.full_name || prev.full_name,
+                    phone: updatedProfile.phone || prev.phone,
+                    college: updatedProfile.college || prev.college,
+                    degree: updatedProfile.degree || prev.degree,
+                    branch: updatedProfile.branch || prev.branch,
+                    graduation_year: updatedProfile.graduation_year || prev.graduation_year,
+                    cgpa: updatedProfile.cgpa !== null && updatedProfile.cgpa !== undefined ? updatedProfile.cgpa : prev.cgpa,
+                    skills: updatedProfile.skills && updatedProfile.skills.length > 0 ? updatedProfile.skills : prev.skills,
+                    projects: updatedProfile.projects && updatedProfile.projects.length > 0 ? updatedProfile.projects : prev.projects,
+                    experience: updatedProfile.experience && updatedProfile.experience.length > 0 ? updatedProfile.experience : prev.experience
+                  }));
+                  if (onSaveProfile) {
+                    onSaveProfile(updatedProfile);
+                  }
+                }}
+              />
+
               <p style={{ fontSize: '0.85rem', color: 'var(--color-gray-secondary)', margin: 0 }}>
                 Basic contact and location parameters used for location-based drive matching and verified student badges.
               </p>

@@ -9,8 +9,9 @@ async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
   
   const token = localStorage.getItem('campusmatch_token');
+  const isFormData = options.body instanceof FormData;
   const headers = {
-    'Content-Type': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
     ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
     ...(options.headers || {})
   };
@@ -82,7 +83,19 @@ export const api = {
       method: 'PATCH',
       body: JSON.stringify(payload)
     }),
-    getNotifications: () => request('/students/me/notifications')
+    getNotifications: () => request('/students/me/notifications'),
+    uploadResume: (file) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      return request('/students/resume/upload', {
+        method: 'POST',
+        body: formData
+      });
+    },
+    confirmResume: (payload) => request('/students/resume/confirm', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    })
   },
 
   jobs: {

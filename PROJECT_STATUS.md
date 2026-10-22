@@ -53,37 +53,68 @@ The system is integrated with an automated Ingestion & Verification Service (`ba
 - Never misrepresents opening an external page as a completed job application.
 - If a listing has no application URL (e.g. Park+), the button is disabled with the message: *"Application link unavailable — contact placement cell or recruiter directly"*.
 
+### E. Task 1: Resume Intelligence & Automatic Profile Creation
+- **Dual-Engine Extraction Service** (`backend/resume_service.py`):
+  - In-memory text extraction for **PDF** (`pypdf`) and **Word DOCX** (`python-docx`).
+  - Strict security validation: File size cap (5MB), allowed extensions (`.pdf`, `.docx`), and header magic bytes (`%PDF`, `PK\x03\x04`).
+  - Scanned/image-only PDF detection: Flags empty or low-character documents with actionable warnings.
+  - **Deterministic Extraction Fallback**: High-precision extraction of full name, email, phone, college, degree, branch, graduation year, CGPA, percentage, technical/soft skills, project portfolios, and work experiences with zero external dependencies.
+  - **Gemini AI Provider Integration**: Structured prompt with strict JSON schema used when `GEMINI_API_KEY` is configured, automatically falling back to the deterministic engine upon network or validation errors.
+  - **Integrity Guarantee**: Never invents or hallucinates data. Missing fields are recorded as `null` and flagged in `missing_fields`. Percentages are never guessed as CGPA.
+- **Automatic Profile Population & Deduplication**:
+  - `POST /api/v1/students/resume/upload`: Secure in-memory upload and extraction for authenticated students.
+  - `POST /api/v1/students/resume/confirm`: Applies confirmed extraction to database.
+  - **Preservation Directive**: Student-entered profile fields are strictly preserved unless the student opts to overwrite (`overwrite_existing=True`).
+  - **Duplicate Prevention**: Repeated uploads deduplicate skills by token and projects by normalized title (`project['title'].strip().lower()`).
+- **Interactive Review Interface** (`src/components/ResumeUploadSection.jsx`):
+  - Integrated directly into Step 1 of the student profile flow and accessible from the Student Dashboard.
+  - Shows animated upload progress and stage diagnostics.
+  - Highlights missing and uncertain fields requiring attention.
+  - Direct inline edit inputs for missing or uncertain attributes before saving.
+
 ---
 
 ## 3. Automated Test Verification Results
 
-Automated test suite located at `backend/tests/test_auth_and_matching.py`:
+Automated test suites located in `backend/tests/`:
 
 ```text
 ============================= test session starts =============================
 platform win32 -- Python 3.13.5, pytest-9.1.1
-collected 10 items
+collected 22 items
 
-backend/tests/test_auth_and_matching.py::test_user_registration_and_login PASSED [ 10%]
-backend/tests/test_auth_and_matching.py::test_admin_registration_forbidden PASSED [ 20%]
-backend/tests/test_auth_and_matching.py::test_unauthenticated_requests_blocked PASSED [ 30%]
-backend/tests/test_auth_and_matching.py::test_student_cannot_access_admin_endpoints PASSED [ 40%]
-backend/tests/test_auth_and_matching.py::test_data_isolation_between_students PASSED [ 50%]
-backend/tests/test_auth_and_matching.py::test_consent_withdrawal_and_recruiter_redaction PASSED [ 60%]
-backend/tests/test_auth_and_matching.py::test_real_world_opportunities_seeded_accurately PASSED [ 70%]
-backend/tests/test_auth_and_matching.py::test_admin_job_sources_registry PASSED [ 80%]
-backend/tests/test_auth_and_matching.py::test_idempotent_seeding PASSED [ 90%]
-backend/tests/test_auth_and_matching.py::test_profile_based_matching PASSED [100%]
+backend/tests/test_auth_and_matching.py::test_user_registration_and_login PASSED [  4%]
+backend/tests/test_auth_and_matching.py::test_admin_registration_forbidden PASSED [  9%]
+backend/tests/test_auth_and_matching.py::test_unauthenticated_requests_blocked PASSED [ 13%]
+backend/tests/test_auth_and_matching.py::test_student_cannot_access_admin_endpoints PASSED [ 18%]
+backend/tests/test_auth_and_matching.py::test_data_isolation_between_students PASSED [ 22%]
+backend/tests/test_auth_and_matching.py::test_consent_withdrawal_and_recruiter_redaction PASSED [ 27%]
+backend/tests/test_auth_and_matching.py::test_real_world_opportunities_seeded_accurately PASSED [ 31%]
+backend/tests/test_auth_and_matching.py::test_admin_job_sources_registry PASSED [ 36%]
+backend/tests/test_auth_and_matching.py::test_idempotent_seeding PASSED [ 40%]
+backend/tests/test_auth_and_matching.py::test_profile_based_matching PASSED [ 45%]
+backend/tests/test_resume_intelligence.py::test_file_validation_rejects_invalid_extension PASSED [ 50%]
+backend/tests/test_resume_intelligence.py::test_file_validation_rejects_empty_file PASSED [ 54%]
+backend/tests/test_resume_intelligence.py::test_file_validation_rejects_oversized_file PASSED [ 59%]
+backend/tests/test_resume_intelligence.py::test_file_validation_rejects_fake_pdf PASSED [ 63%]
+backend/tests/test_resume_intelligence.py::test_file_validation_rejects_fake_docx PASSED [ 68%]
+backend/tests/test_resume_intelligence.py::test_docx_text_extraction PASSED [ 72%]
+backend/tests/test_resume_intelligence.py::test_deterministic_parser_extracts_correct_fields PASSED [ 77%]
+backend/tests/test_resume_intelligence.py::test_missing_fields_do_not_hallucinate PASSED [ 81%]
+backend/tests/test_resume_intelligence.py::test_percentage_not_converted_to_cgpa PASSED [ 86%]
+backend/tests/test_resume_intelligence.py::test_unauthorized_resume_upload_fails PASSED [ 90%]
+backend/tests/test_resume_intelligence.py::test_recruiter_forbidden_from_student_resume_upload PASSED [ 95%]
+backend/tests/test_resume_intelligence.py::test_student_resume_upload_and_confirmation_lifecycle PASSED [100%]
 
-======================= 10 passed, 4 warnings in 3.65s ========================
+======================= 22 passed, 4 warnings in 4.19s ========================
 ```
 
 Frontend production bundle test:
 ```text
-✓ built in 4.70s
-dist/index.html                   1.02 kB
-dist/assets/index-DF1AfwAP.css   18.27 kB
-dist/assets/index-CWs8Z0zh.js   301.96 kB
+✓ built in 6.78s
+dist/index.html                   1.02 kB │ gzip:  0.56 kB
+dist/assets/index-DF1AfwAP.css   18.27 kB │ gzip:  3.90 kB
+dist/assets/index-CTw5rTb4.js   320.72 kB │ gzip: 82.94 kB
 ```
 
 ---
@@ -91,3 +122,4 @@ dist/assets/index-CWs8Z0zh.js   301.96 kB
 ## 4. Known Limitations & Architecture Notes
 - **Email Verification & Password Recovery Tokens**: Structure is prepared for cryptographically hashed, single-use tokens; full production SMTP dispatch is disabled in local development in favor of preview generation and in-app logs.
 - **Unverified Listings**: Shared announcements from community boards are marked as `unverified` and `shared_announcement` until reviewed by a placement administrator.
+- **Scanned Resumes**: Optical Character Recognition (OCR) for pure image scans requires Tesseract binaries; system flags scanned documents with a guidance warning to confirm fields manually.

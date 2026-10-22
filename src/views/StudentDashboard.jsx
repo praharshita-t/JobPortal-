@@ -112,13 +112,25 @@ export default function StudentDashboard({
                 ? `Missing: ${profileCompletion.missing_fields.slice(0, 2).join(', ')}`
                 : 'All fields completed!'}
             </span>
+          </div>
+
+          <div style={{ display: 'flex', gap: '8px', marginTop: '10px', borderTop: '1px solid #E5E7EB', paddingTop: '8px' }}>
             <button
               className="btn btn-sm btn-ghost"
               onClick={onOpenOnboardingModal}
-              style={{ padding: '2px 6px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-charcoal)' }}
+              style={{ flex: 1, padding: '4px 6px', fontSize: '0.75rem', fontWeight: 600, color: 'var(--color-charcoal)' }}
             >
               <Edit3 size={12} />
               <span>Edit Profile</span>
+            </button>
+            <button
+              className="btn btn-sm btn-primary"
+              onClick={onOpenOnboardingModal}
+              style={{ flex: 1, padding: '4px 6px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+              title="Upload resume to autofill profile"
+            >
+              <Sparkles size={12} />
+              <span>Upload Resume</span>
             </button>
           </div>
         </div>
@@ -406,6 +418,18 @@ export default function StudentDashboard({
                 + Add Skills
               </button>
             </div>
+
+            {studentProfile?.resume_filename && (
+              <div style={{ backgroundColor: 'var(--pale-lavender)', padding: '6px 10px', borderRadius: '4px', marginBottom: '12px', border: '1px solid var(--primary-lavender)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '0.75rem' }}>
+                <span style={{ color: 'var(--color-charcoal)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <ShieldCheck size={14} style={{ color: 'var(--muted-sage-dark)' }} />
+                  Synced: <strong>{studentProfile.resume_filename}</strong>
+                </span>
+                <span className="badge-editorial badge-sage" style={{ fontSize: '0.65rem' }}>
+                  Autofilled
+                </span>
+              </div>
+            )}
 
             <div className="skills-chip-group">
               {(studentProfile?.skills || []).map((skill, idx) => (

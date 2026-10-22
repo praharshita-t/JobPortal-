@@ -25,7 +25,9 @@ htmlcov/
 
 # Local databases & test files
 test_campusmatch.db
+test_*.db
 *.sqlite3-journal
+*.db-journal
 
 # Environment variables & secrets
 .env

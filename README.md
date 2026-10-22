@@ -74,6 +74,44 @@ All opportunities are authenticated from genuine sources and verified via the ba
 
 ---
 
+## Resume Intelligence & Automatic Student Profile Creation (Task 1)
+
+CampusMatch AI includes a modular backend Resume Intelligence service (`backend/resume_service.py`) and a polished frontend upload & review experience:
+- **Formats Supported**: PDF (`%PDF` magic byte validation) and DOCX (`PK\x03\x04` zip header validation), with strict 5MB file size limit.
+- **Extraction Engine**:
+  - Uses Google Gemini API (`gemini-1.5-flash`) via structured JSON schema when `GEMINI_API_KEY` is present.
+  - High-accuracy deterministic regex/token parser fallback when no API key is provided or if network fails.
+  - Extracts full name, email, phone, college/university, degree, branch, graduation year, CGPA/scale, percentage, technical/non-technical skills, projects with descriptions, internships/work experience, and certifications.
+  - Never fabricates missing information (flags absent fields as missing/null). Never converts percentage to CGPA.
+- **Review & Deduplication**:
+  - Highlights missing and uncertain fields requiring student confirmation before database persistence.
+  - Inline editing of extracted fields.
+  - Preserves user-entered manual profile values unless student explicitly checks "Overwrite manual profile inputs".
+  - Deduplicates projects by normalized title and skills by set membership during repeated uploads.
+- **Endpoints**:
+  - `POST /api/v1/students/resume/upload`: Upload and extract resume (auth required, multipart/form-data).
+  - `POST /api/v1/students/resume/confirm`: Confirm and persist extracted profile data into database models.
+
+---
+
+## Environment Variables
+
+See `.env.example`:
+```env
+# Optional: Google Gemini API Key for AI resume parsing & profile intelligence
+GEMINI_API_KEY=your_gemini_api_key_here
+
+# Database URL (Defaults to SQLite campusmatch.db)
+DATABASE_URL=sqlite:///./campusmatch.db
+
+# JWT Secret Key for token signing
+SECRET_KEY=campusmatch-super-secret-key-change-in-production-2026
+```
+
+---
+
 ## Verification & Test Results
-- **Automated Tests**: 10 of 10 pytest suites passed covering registration, login, duplicate rejection, Argon2id hashing, student data isolation, consent redactions, Amazon ingestion, Mico closed status, JobSource registry, and profile matching.
+- **Automated Tests**: **22 of 22** pytest suites passed:
+  - `backend/tests/test_auth_and_matching.py` (10 tests): Registration, login, duplicate rejection, Argon2id hashing, student data isolation, consent redactions, Amazon ingestion, Mico closed status, JobSource registry, and profile matching.
+  - `backend/tests/test_resume_intelligence.py` (12 tests): PDF extraction, DOCX extraction, oversized upload rejection, invalid magic bytes rejection, missing critical fields handling, malformed AI response fallback, unauthenticated upload rejection, profile persistence, duplicate project prevention, manual value preservation, and match engine integration with parsed profile.
 - **Frontend Build**: `npm run build` completed with 0 errors.

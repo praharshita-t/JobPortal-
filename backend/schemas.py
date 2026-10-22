@@ -66,6 +66,7 @@ class StudentProfileUpdate(BaseModel):
     skills: Optional[List[str]] = None
     projects: Optional[List[Dict[str, Any]]] = None
     experience: Optional[List[Dict[str, Any]]] = None
+    certifications: Optional[List[str]] = None
 
     preferred_roles: Optional[List[str]] = None
     preferred_industries: Optional[List[str]] = None
@@ -103,6 +104,11 @@ class StudentProfileOut(BaseModel):
     skills: List[str]
     projects: List[Dict[str, Any]]
     experience: List[Dict[str, Any]]
+    certifications: List[str] = []
+
+    resume_filename: Optional[str] = None
+    resume_uploaded_at: Optional[datetime] = None
+    resume_extraction_metadata: Optional[Dict[str, Any]] = None
 
     preferred_roles: List[str]
     preferred_industries: List[str]
@@ -120,6 +126,37 @@ class StudentProfileOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+# ----------------- Resume Intelligence Schemas -----------------
+class ResumeExtractionResult(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+
+    college: Optional[str] = None
+    degree: Optional[str] = None
+    branch: Optional[str] = None
+    graduation_year: Optional[int] = None
+    cgpa: Optional[float] = None
+    cgpa_scale: Optional[float] = 10.0
+    percentage: Optional[float] = None
+
+    skills: List[str] = []
+    projects: List[Dict[str, Any]] = []
+    experience: List[Dict[str, Any]] = []
+    certifications: List[str] = []
+
+    uncertain_fields: List[str] = []
+    missing_fields: List[str] = []
+    confidence_scores: Dict[str, float] = {}
+    extractor: str = "deterministic"
+    source_evidence: Dict[str, str] = {}
+    raw_character_count: int = 0
+    warning: Optional[str] = None
+
+class ResumeConfirmPayload(BaseModel):
+    overwrite_existing: bool = False
+    profile_data: Dict[str, Any]
 
 class ProfileCompletionOut(BaseModel):
     completion_percentage: int
