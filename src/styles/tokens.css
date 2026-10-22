@@ -1,0 +1,49 @@
+:root {
+  /* Core brand palette strictly adhering to specifications */
+  --primary-lavender: #BC87F5;
+  --secondary-purple: #D0B3F9;
+  --pale-lavender: #E4DEFC;
+  --warm-offwhite: #FAFAFA;
+  --muted-sage: #C2E4D9;
+  --muted-sage-dark: #2A6858;
+  --muted-sage-bg: #EBF8F4;
+
+  /* Editorial & Interface Neutrals */
+  --color-charcoal: #18181B;
+  --color-charcoal-soft: #27272A;
+  --color-gray-secondary: #6B7280;
+  --color-gray-subtle: #9CA3AF;
+  --color-gray-border: #E5E7EB;
+  --color-lavender-border: #D8CEF8;
+  --color-surface-white: #FFFFFF;
+  --color-surface-muted: #F5F3FF;
+  --color-surface-hover: #F8F7FF;
+
+  /* Functional alert colors */
+  --color-danger: #DC2626;
+  --color-danger-bg: #FEE2E2;
+  --color-danger-border: #FECACA;
+  --color-warning: #D97706;
+  --color-warning-bg: #FEF3C7;
+
+  /* Typography */
+  --font-editorial: 'Instrument Serif', Georgia, serif;
+  --font-display-modern: 'Syne', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Elevation and shadows */
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.04);
+  --shadow-md: 0 4px 12px rgba(24, 24, 27, 0.05), 0 1px 3px rgba(24, 24, 27, 0.03);
+  --shadow-lg: 0 12px 24px -4px rgba(24, 24, 27, 0.06), 0 4px 8px -2px rgba(24, 24, 27, 0.03);
+  --shadow-pop: 0 20px 35px -8px rgba(188, 135, 245, 0.22);
+  --shadow-editorial: 4px 4px 0px #18181B;
+  --shadow-lavender: 3px 3px 0px #BC87F5;
+
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-medium: 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout Constants */
+  --nav-height: 64px;
+  --max-content-width: 1400px;
+}

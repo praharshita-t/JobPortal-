@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Production build
+dist/
+build/
+
+# Python cache & virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases & test files
+test_campusmatch.db
+*.sqlite3-journal
+
+# Environment variables & secrets
+.env
+.env.local
+.env.*.local
+
+# Editor directories & system files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.DS_Store
+Thumbs.db
